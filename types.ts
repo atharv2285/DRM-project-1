@@ -24,3 +24,25 @@ export interface PayoffDataPoint {
   actualCallPL: number;
   syntheticCallPL: number;
 }
+
+export interface MonthlyReturn {
+  month: string;
+  coveredCall: number;
+  protectivePut: number;
+  longStraddle: number;
+}
+
+export interface StrategyMetrics {
+  totalReturn: number;
+  winRate: number;
+  maxDrawdown: number;
+  bestMonth: number;
+  worstMonth: number;
+  annualizedVolatility: number;
+}
+
+export interface StrategyResult {
+  name: string;
+  metrics: StrategyMetrics;
+  cumulativeReturns: { month: number; value: number }[];
+}

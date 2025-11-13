@@ -1,19 +1,14 @@
-
 import React, { useState, useMemo, useCallback } from 'react';
 import type { OptionInputParams } from '../types';
 import { calculateBSM } from '../services/optionPricingService';
-import { fetchModelExplanation } from '../services/geminiService';
 import Card from './common/Card';
 import Input from './common/Input';
-import Button from './common/Button';
 import PayoffChart from './charts/PayoffChart';
 
 const SyntheticOptionModel: React.FC = () => {
   const [params, setParams] = useState<OptionInputParams>({
     S: 100, K: 100, T: 0.25, r: 0.05, sigma: 0.2,
   });
-  const [explanation, setExplanation] = useState('');
-  const [isLoadingExplanation, setIsLoadingExplanation] = useState(false);
 
   const handleParamChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -21,7 +16,7 @@ const SyntheticOptionModel: React.FC = () => {
   }, []);
 
   const { costs, payoffData } = useMemo(() => {
-    const { S, K, T, r, sigma } = params;
+    const { S, K } = params;
     
     // 1. Calculate costs
     const optionPrices = calculateBSM(params);
@@ -43,14 +38,6 @@ const SyntheticOptionModel: React.FC = () => {
     return { costs, payoffData: data };
   }, [params]);
 
-  const handleGetExplanation = async () => {
-    setIsLoadingExplanation(true);
-    setExplanation('');
-    const fetchedExplanation = await fetchModelExplanation('Synthetic');
-    setExplanation(fetchedExplanation);
-    setIsLoadingExplanation(false);
-  };
-
   return (
     <div className="space-y-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -65,16 +52,16 @@ const SyntheticOptionModel: React.FC = () => {
             </Card>
             
             <Card title="Strategy Cost Comparison" className="md:col-span-2">
-                <p className="text-sm text-gray-400 mb-6">Based on Put-Call Parity, the cost to establish both positions should be nearly identical, ignoring transaction fees and market frictions.</p>
+                <p className="text-sm text-gray-600 mb-6">Based on Put-Call Parity, the cost to establish both positions should be nearly identical, ignoring transaction fees and market frictions.</p>
                 <div className="flex justify-around items-center h-full">
                     <div className="text-center">
-                        <h3 className="text-lg text-gray-300 mb-2">Actual Call Cost</h3>
-                        <p className="text-4xl font-bold text-cyan-400">${costs.actualCallCost.toFixed(4)}</p>
+                        <h3 className="text-lg text-gray-700 mb-2">Actual Call Cost</h3>
+                        <p className="text-4xl font-bold text-orange-600">${costs.actualCallCost.toFixed(4)}</p>
                     </div>
                      <div className="text-center">
-                        <h3 className="text-lg text-gray-300 mb-2">Synthetic Call Cost</h3>
-                        <p className="text-4xl font-bold text-orange-400">${costs.syntheticCallCost.toFixed(4)}</p>
-                        <p className="text-xs text-gray-500 mt-1">(Stock Price + Put Premium)</p>
+                        <h3 className="text-lg text-gray-700 mb-2">Synthetic Call Cost</h3>
+                        <p className="text-4xl font-bold text-orange-500">${costs.syntheticCallCost.toFixed(4)}</p>
+                        <p className="text-xs text-gray-600 mt-1">(Stock Price + Put Premium)</p>
                     </div>
                 </div>
             </Card>
@@ -82,17 +69,6 @@ const SyntheticOptionModel: React.FC = () => {
 
         <Card title="Payoff Comparison at Expiry">
             <PayoffChart data={payoffData} />
-        </Card>
-
-        <Card title="About Synthetic Options">
-            <div className="space-y-4">
-            <Button onClick={handleGetExplanation} disabled={isLoadingExplanation}>
-                {isLoadingExplanation ? 'Loading Explanation...' : 'Explain Synthetic Calls with AI'}
-            </Button>
-            {explanation && (
-                <div className="prose prose-invert prose-sm max-w-none mt-4 text-gray-300" dangerouslySetInnerHTML={{__html: explanation.replace(/\n/g, '<br />')}} />
-            )}
-            </div>
         </Card>
     </div>
   );
