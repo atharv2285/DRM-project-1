@@ -1,0 +1,5 @@
+{
+  "name": "BITS Pilani: Option Pricing & Portfolio Construction",
+  "description": "A financial modeling tool to price European options using the Black-Scholes-Merton and Binomial models, with advanced analysis of option greeks and AI-powered explanations.",
+  "requestFramePermissions": []
+}
